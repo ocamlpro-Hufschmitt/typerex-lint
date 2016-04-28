@@ -1,41 +1,45 @@
-# simpleVar
+@simpleVar
+(* This is a comment *)
 ```
 - x
+(* This is a comment too *)
 + y
 ```
 
-# apply
+@apply
 ```
 - f x
 + foo
 ```
 
-# functionMatch
+(* And this is also a commment *)
+
+@functionMatch
 ```
 - fun x -> x
 + foo
 ```
 
-# letBinding
+@letBinding
 ```
 - let x = 1 in x
 + tralala
 ```
 
-# replaceInsideLet
+@replaceInsideLet
 ```
 let x = 1 in
 - x
 + y
 ```
 
-# tuples
+@tuples
 ```
 - 1, 2, 3, 4
 + foo
 ```
 
-# listCompare
+@listCompare
 expressions: l, e1, e2
 message: "This is a message"
 ```
@@ -45,7 +49,7 @@ message: "This is a message"
 + | _  -> e2
 ```
 
-# function
+@function
 ```
 function
   | foo -> true
