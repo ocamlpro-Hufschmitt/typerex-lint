@@ -50,13 +50,13 @@ let apply patch expr =
           in
           Error.map (fun (e, env) -> apply_replacements e attrs2 env, env) replacements
         );
-      pattern = (fun _self env ~patch:pat2 ~pat:pat1 ->
+      pattern = (fun self env ~patch:pat2 ~pat:pat1 ->
           let replacements =
             match pat1.ppat_desc, pat2.ppat_desc with
             | Ppat_var v, Ppat_var v' when v.Asttypes.txt = v'.Asttypes.txt -> Ok (pat1, env)
             | Ppat_var { Asttypes.txt = v; _ }, Ppat_var { Asttypes.txt = v'; _ } when is_meta_binding v' ->
               Ok (pat1, Variables.add_env v' (Variables.Ident v) env)
-            | _ -> Error (pat1, env)
+            | _ -> default.pattern self env ~patch:pat2 ~pat:pat1
           in replacements
         )
     }
@@ -132,6 +132,16 @@ let apply patch expr =
             Pexp_construct (ident, mapped_expr), [env_expr]
           )
 
+      | Pexp_match (expr, cases) ->
+        apply_to_cases env patch cases
+        >>= (fun (mapped_cases, env_cases) ->
+            apply_to_expr env_cases ~expr ~patch
+            >|= (fun (mapped_expr, env_expr) ->
+                Pexp_match (mapped_expr, mapped_cases),
+                [ env_cases; env_expr ]
+              )
+          )
+
       | _ ->
         Pprintast.expression Format.std_formatter expr;
         Format.print_newline ();
@@ -196,7 +206,8 @@ let apply patch expr =
   and apply_to_maybe_expr env patch =
     let open Res.Err_monad_infix in
     function
-    | Some expr -> apply_to_expr env ~expr ~patch >|= (fun (expr, env) -> Some expr, env)
+    | Some expr -> apply_to_expr env ~expr ~patch
+      >|= (fun (expr, env) -> Some expr, env)
     | None -> Ok (None, env)
 
   in
