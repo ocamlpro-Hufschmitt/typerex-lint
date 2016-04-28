@@ -1,32 +1,36 @@
-# patch0
+# simpleVar
 ```
-- f x
+- x
 + y
 ```
 
-# patch1
+# apply
 ```
-- x
-+ (x+1)
-```
-
-# patch2
-variables: foo
-```
-- foo
-+ bar
-```
-
-# patch3
-variables: y
-```
-- fun y -> y
+- f x
 + foo
 ```
 
+# functionMatch
+```
+- fun x -> x
++ foo
+```
 
-# patch4
+# letBinding
 ```
 - let x = 1 in x
 + tralala
+```
+
+# replaceInsideLet
+```
+let x = 1 in
+- x
++ y
+```
+
+# tuples
+```
+- 1, 2, 3, 4
++ foo
 ```
