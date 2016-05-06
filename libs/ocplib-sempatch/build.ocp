@@ -1,5 +1,14 @@
 comp += [ "-w" "+A-4" ]
 
+begin program "ppx_monad"
+    files = [
+      "src/ppx_monad.ml"
+    ]
+    requires = [
+    "compiler-libs.common"
+    ]
+end
+
 begin library "ocplib-sempatch"
     files = [
       "lib/std_utils.ml"
@@ -27,7 +36,9 @@ begin library "ocplib-sempatch"
     requires = [
         "compiler-libs"
         "compiler-libs.common"
+        "ppx_monad"
     ]
+    comp += [ "-ppx" "%{ppx_monad_DST_DIR}%/ppx_monad.asm" ]
     ocamlyacc = "menhir"
 end
 
