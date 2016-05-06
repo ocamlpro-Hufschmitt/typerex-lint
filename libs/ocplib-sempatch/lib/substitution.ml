@@ -14,20 +14,16 @@ let get key vars =
     Not_found -> None
 
 let get_expr key vars =
-  get key vars
-  >>= (function
-      | AE.Expression e -> Some e
-      | AE.Ident i ->
-        Ast_helper.Exp.ident (Location.mknoloc (Longident.Lident i))
-                      |> Option.some
-    )
+  match%bind get key vars with
+  | AE.Expression e -> Some e
+  | AE.Ident i ->
+    Ast_helper.Exp.ident (Location.mknoloc (Longident.Lident i))
+    |> Option.some
 
 let get_ident key vars =
-  get key vars
-  >>= (function
-      | AE.Ident p -> Some p
-      | _ -> None
-    )
+  match%bind get key vars with
+  | AE.Ident p -> Some p
+  | _ -> None
 
 (* let is_defined_ident key vars = Option.is_some (get_ident key vars) *)
 
