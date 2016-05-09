@@ -39,6 +39,7 @@ begin library "ocplib-sempatch"
         "ppx_monad"
     ]
     comp += [ "-ppx" "%{ppx_monad_DST_DIR}%/ppx_monad.asm" ]
+    comp_requires = "ppx_monad:asm"
     ocamlyacc = "menhir"
 end
 
