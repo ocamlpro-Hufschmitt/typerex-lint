@@ -39,9 +39,9 @@ let variant_of_type_decl loc type_decl =
   in
   let args =
     match type_decl.ptype_manifest with
-    | Some typ -> [typ]
+    | Some typ -> Pcstr_tuple [typ]
     | None ->
-      [H.Typ.constr
+      Pcstr_tuple [H.Typ.constr
          ~loc
          (L.mkloc type_lid loc)
          (type_decl.ptype_params |> List.map fst)]
@@ -135,6 +135,7 @@ let str_of_type type_decls cmd =
              (H.Mod.structure ~loc
                 (preamble @
                  [H.Str.type_ ~loc
+                    Recursive
                     sum_type ])))
     in
     match cmd with
@@ -201,7 +202,7 @@ let mapper = let open M in
     in
     List.bind (fun x ->
         match x.psig_desc with
-        | Psig_type types when is_def_of "expression" types ->
+        | Psig_type (_, types) when is_def_of "expression" types ->
           str_of_type types cmd
         | _ -> []
       )
@@ -218,7 +219,7 @@ let mapper = let open M in
                 | PStr [%str
                     [%e? {
                          pexp_desc = Pexp_constant
-                             (Asttypes.Const_string (name, None)); _
+                             (Pconst_string (name, None)); _
                        }
                     ]
                   ] -> Some name

@@ -175,7 +175,9 @@ let generate_match_on_variant loc cases =
   let here elt = L.mkloc elt loc in
   let generate_match case =
     let name = case.pcd_name.txt in
-    let args = name_args case.pcd_args
+    let args = match case.pcd_args with
+      | Pcstr_tuple t -> name_args t
+      | Pcstr_record _ -> assert false
     in
     let mk_sub_pattern constr getter =
       H.Pat.construct

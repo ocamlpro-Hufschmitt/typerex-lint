@@ -95,8 +95,13 @@ let create_record_match loc name fields =
 let create_variant_match loc type_name variant =
   let variant_name = variant.pcd_name.txt in
   let here elt = L.mkloc elt loc in
+  let variant_args =
+    match variant.pcd_args with
+    | Pcstr_tuple t -> t
+    | Pcstr_record _ -> assert false
+  in
   let args = List.mapi (fun idx _ -> "state_" ^ (string_of_int idx))
-      variant.pcd_args
+      variant_args
   in
   let pattern =
     H.Pat.construct
@@ -106,7 +111,7 @@ let create_variant_match loc type_name variant =
           H.Pat.construct
             ~loc
             (here @@ Longident.Lident (C.cstr variant_name))
-            (generate_patterns loc variant.pcd_args)
+            (generate_patterns loc variant_args)
         ))
   and results =
     let sub_results = generate_tuple loc args in

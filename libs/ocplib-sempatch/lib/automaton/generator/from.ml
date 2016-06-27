@@ -52,13 +52,17 @@ let apply_overrides = List.map (
 let nth_arg n = Printf.sprintf "sub_%i" n
 
 let args_pattern loc case =
+  let case_args = match case.pcd_args with
+    | Pcstr_tuple t -> t
+    | Pcstr_record _ -> assert false
+  in
   let elts =
     List.mapi (fun idx _ ->
         H.Pat.var
           ~loc
           (L.mkloc (nth_arg idx) loc)
       )
-      case.pcd_args
+      case_args
   in
   match elts with
   | [] -> None
@@ -79,15 +83,15 @@ let generate_sub_match loc typ var_name =
   H.Exp.apply
     ~loc
     (generate_froms loc typ)
-    ["", H.Exp.ident ~loc (L.mkloc (LI.Lident var_name) loc)]
+    [Nolabel, H.Exp.ident ~loc (L.mkloc (LI.Lident var_name) loc)]
 
 let build_sub_from loc index typ =
   let arg_name = "sub_" ^ (string_of_int index) in
-  "",
+  Nolabel,
   H.Exp.apply
     ~loc
     (generate_froms loc typ)
-    ["", H.Exp.ident ~loc (L.mkloc (LI.Lident arg_name) loc)]
+    [Nolabel, H.Exp.ident ~loc (L.mkloc (LI.Lident arg_name) loc)]
 
 let apply_from loc name args =
   let matcher = H.Exp.ident (L.mkloc (C.mk_match name) loc) in
@@ -122,10 +126,10 @@ let str_of_core_type self type_declarations loc name typ =
         (H.Exp.ident ~loc (Location.mkloc
                              (C.mk_match name) loc))
         (List.map (fun (name, typ) ->
-             "", H.Exp.apply
+             Nolabel, H.Exp.apply
                ~loc
                (generate_froms loc typ)
-               [("",(H.Exp.ident
+               [(Nolabel,(H.Exp.ident
                        ~loc
                        (L.mkloc (LI.Lident name) loc)))]
            )
@@ -185,6 +189,10 @@ let rec from_builder_of_type loc type_decls name type_decl =
       ~loc
       (List.map
          (fun case ->
+            let case_args = match case.pcd_args with
+              | Pcstr_tuple t -> t
+              | Pcstr_record _ -> assert false
+            in
             H.Exp.case
               (H.Pat.construct
                  ~loc
@@ -193,14 +201,14 @@ let rec from_builder_of_type loc type_decls name type_decl =
               )
               (apply_from loc
                  (name ^ "_" ^ Common.id case.pcd_name.txt)
-                 case.pcd_args
+                 case_args
               )
          )
          cases
       )
   | Ptype_record fields ->
     H.Exp.fun_
-      ""
+      Nolabel
       None
       (H.Pat.record
          ~loc
@@ -218,7 +226,7 @@ let rec from_builder_of_type loc type_decls name type_decl =
           (H.Exp.ident (L.mkloc (C.mk_match name) loc))
           (List.map
              (fun field ->
-                "",
+                Nolabel,
                 generate_sub_match
                   loc
                   field.pld_type

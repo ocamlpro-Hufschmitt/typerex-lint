@@ -1,3 +1,10 @@
+@Any
+expressions: cond
+message: "Use 'not $cond' instead of '$cond = false'."
+```
+cond = false
+```
+
 @Incr
 expressions: e1, e2
 message: "Use 'incr $e1' instead of '$e1 := !$e2 + 1.'"
@@ -14,6 +21,7 @@ when: "e1 = e2"
 - e1 := !e2 - 1
 + decr e1
 ```
+
 @CompToFalse
 expressions: cond
 message: "Use 'not $cond' instead of '$cond = false'."

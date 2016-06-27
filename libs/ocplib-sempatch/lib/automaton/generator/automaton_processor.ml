@@ -82,8 +82,8 @@ let convert_to_states =
               fun cd ->
                 let args =
                   match cd.pcd_args with
-                  | [{ ptyp_desc = Ptyp_tuple _; ptyp_loc = loc; _} as arg] ->
-                    [
+                  | Pcstr_tuple [{ ptyp_desc = Ptyp_tuple _; ptyp_loc = loc; _} as arg] ->
+                    Pcstr_tuple [
                       {
                         arg with
                         ptyp_desc = Ptyp_constr (L.mkloc state_lid loc, []);

@@ -73,7 +73,7 @@ let get_val_decls = List.bind (
 
 let get_type_decls = List.bind (
     fun stri -> match stri.pstr_desc with
-      | Pstr_type t -> t
+      | Pstr_type (_, t) -> t
       | _ -> []
   )
 
@@ -109,14 +109,24 @@ type longident__t = Longident.t =
   | Ldot of Longident.t * string
   | Lapply of Longident.t * Longident.t
 
+type arg_label =
+    Nolabel
+  | Labelled of string (*  label:T -> ... *)
+  | Optional of string
 type constant =
-    Const_int of int
-  | Const_char of char
-  | Const_string of string * string option
-  | Const_float of string
-  | Const_int32 of int32
-  | Const_int64 of int64
-  | Const_nativeint of nativeint
+    Pconst_integer of string * char option
+  | Pconst_char of char
+  | Pconst_string of string * string option
+  | Pconst_float of string * char option
+type char_option = char option
+(* type constant = *)
+(*     Const_int of int *)
+(*   | Const_char of char *)
+(*   | Const_string of string * string option *)
+(*   | Const_float of string *)
+(*   | Const_int32 of int32 *)
+(*   | Const_int64 of int64 *)
+(*   | Const_nativeint of nativeint *)
 
 and rec_flag = Nonrecursive | Recursive
 and direction_flag  = Upto | Downto
