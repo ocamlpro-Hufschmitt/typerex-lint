@@ -118,3 +118,11 @@ when: "e1 = e2"
 ```
 if cond then e1 else e2
 ```
+
+@ MatchOnConstant
+expressions: e, pat, result
+message: "Don't be stupid"
+when: "is_constant(e)"
+```
+match%__sempatch_first e with pat -> result
+```

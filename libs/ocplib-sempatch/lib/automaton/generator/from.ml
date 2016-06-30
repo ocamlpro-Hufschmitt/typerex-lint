@@ -29,6 +29,24 @@ let overrides = C.get_val_decls [%str
       | Pexp_extension ({ Asttypes.txt = "__sempatch_inside"; _},
                         PStr [{ pstr_desc = Pstr_eval (e, _); _ }]) ->
         add_transitions_from (Match.wildcard ()) (expression e)
+      | Pexp_extension ({ Asttypes.txt = "__sempatch_first"; _},
+                        PStr [{ pstr_desc = Pstr_eval (e, _); _ }]) ->
+        begin
+          match e.pexp_desc with
+          | Pexp_match (e_patch, cases_patch) ->
+            let rec case_list' = function
+              | [] -> (Match.case_list_any : A.state)
+              | sub_0::sub_1 ->
+                (Match.case_list_cons (case sub_0) (case_list' sub_1) : A.state)
+            in
+            let from_expr_desc =
+              (Match.expression_desc_pexp_match (expression e_patch)
+                 (case_list' cases_patch))
+            in
+            Match.expression (from_expr_desc) (location__t pexp_loc)
+              (attributes pexp_attributes)
+          | _ -> expression e
+        end
       | Pexp_ident ( { txt = Longident.Lident id; _ })
         when has_attr "__sempatch_metavar" pexp_attributes ->
         Match.metavar_expr id
@@ -137,7 +155,7 @@ let str_of_core_type self type_declarations loc name typ =
         ~loc
         (Location.mkloc
            (C.mk_exploded @@
-                     C.cstr (Longident.last id))
+            C.cstr (Longident.last id))
            loc)
         (Some (H.Pat.var ~loc (Location.mkloc "y" loc)))
     in
@@ -234,7 +252,7 @@ let rec from_builder_of_type loc type_decls name type_decl =
         H.Exp.ident
           ~loc
           (here (C.mk_match @@
-                          C.id type_decl.ptype_name.txt))
+                 C.id type_decl.ptype_name.txt))
       | Some t ->
         str_of_core_type
           (from_builder_of_type loc type_decls type_decl.ptype_name.txt)

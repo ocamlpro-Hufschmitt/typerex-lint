@@ -1,3 +1,5 @@
+open Std_utils
+
 open Location
 open! Asttypes
 open Parsetree
@@ -32,6 +34,8 @@ sig
 
   val metavar_expr : string -> A.state
   val metavar_pat : string -> A.state
+
+  val case_list_any : A.state
 end =
 struct
   include Match_
@@ -84,6 +88,10 @@ struct
           | _ -> []
       ]
     }
+
+  let case_list_any = basic_state @@ function
+    | Element.Case_list _ -> [A.Final]
+    |_ -> [A.Trash]
 
   [%%create_wildcard]
 end
