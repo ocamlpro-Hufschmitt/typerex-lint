@@ -37,11 +37,17 @@ The current automaton has two flaws :
 
 A rewrite has begun
 [here](https://github.com/ocamlpro-Hufschmitt/typerex-lint/tree/bup/libs/ocplib-sempatch/lib/automaton),
-but the generation from the Parsetree has never been done.
+but the generation from the Parsetree han't been finished (but almost...).
 
-(In previous link, the toplevel dir is a toy automaton on a simple tree, and
-the "abc" dir contains the begining of the program supposed to generate the
-corresponding automaton for the parsetree).
+The idea of the generator is that it reads the cmi of the parsetree from
+current compiler (currently whith a hardcoded path which probably doesn't exist
+in your computer), and uses the type declaration in it to generate a lot of
+stuff. (more or less every module in libs/ocplib-sempatch/lib/automaton/abc is
+a generator for some part of the code).
+
+What remains to do is mostly to generate the evaluator and add special cases
+for nodes that have to be treated in a special way (like Locations which have
+to be ignored and special annotations).
 
 ### Allow patching more than expressions and structures
 
@@ -59,3 +65,21 @@ to get the full modified AST.
 ### Extend the grammar and clarify it
 
 A lot of things to do...
+
+#### Add disjunctions
+
+Allows writing patches like this (if possible whith a less ugly syntax)
+
+```
+x
+(
+=
+|
+==
+)
+y
+```
+
+which detects `x = y` and `x == y`
+
+This can be really handy when used in the linter
